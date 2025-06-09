@@ -167,6 +167,3 @@ For additional assistance:
 - Check Terraform registry for module examples
 - Review CloudWatch logs for detailed error information
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
