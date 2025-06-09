@@ -1,241 +1,170 @@
-# LAMP Stack on AWS with Terraform - Modules Documentation
-
-## Overview
-
-This Terraform project provides modular infrastructure for deploying a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS. The infrastructure is divided into reusable modules that can be composed together.
-
+# LAMP Stack Deployment on AWS with Terraform
 
 ![Architecture](media/lampstack_design.png)
 
-## Module Structure
+## Project Overview
 
+This Terraform project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS, following AWS Well-Architected Framework principles. The infrastructure is designed for scalability, availability, and security, with modular components that can be adapted for different use cases.
+
+## Key Features
+
+- **Highly Available Architecture**: Multi-AZ deployment for all critical components
+- **Auto-scaling Web Tier**: Automatic scaling of web servers based on demand
+- **Managed Database**: Amazon RDS MySQL with automated backups
+- **Secure Configuration**: Network isolation and restricted access
+- **Infrastructure as Code**: Reproducible deployments using Terraform
+- **Monitoring**: Built-in CloudWatch alarms for key metrics
+
+## Prerequisites
+
+- AWS account with appropriate permissions
+- Terraform v1.0+ installed
+- AWS CLI configured
+- SSH key pair for EC2 access
+
+## Architecture Components
+
+The solution consists of the following core components:
+
+1. **Networking Layer**:
+   - VPC with public and private subnets across multiple AZs
+   - Internet Gateway and NAT Gateway for connectivity
+   - Route tables for traffic management
+
+2. **Compute Layer**:
+   - Auto Scaling Group for web servers
+   - Launch template with LAMP stack bootstrap
+   - Application Load Balancer with health checks
+
+3. **Data Layer**:
+   - Amazon RDS MySQL instance
+   - Automated backups and maintenance
+
+4. **Security Layer**:
+   - Security groups restricting traffic flow
+   - IAM roles with least privilege
+
+5. **Monitoring Layer**:
+   - CloudWatch alarms for performance metrics
+   - SNS notifications for critical events
+
+## Deployment Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-repo/lamp-stack-aws.git
+cd lamp-stack-aws
 ```
-modules/
-├── auto_scaling/       # Auto Scaling Group for web servers
-├── compute/            # EC2 instances (alternative to ASG)
-├── database/           # RDS MySQL database
-├── load_balancer/      # Application Load Balancer
-├── monitoring/         # CloudWatch alarms and metrics
-├── security_groups/    # Security group definitions
-└── vpc/                # VPC and networking components
+
+### 2. Initialize Terraform
+
+```bash
+terraform init
 ```
 
-## Module Details
+### 3. Configure Variables
 
-### 1. VPC Module
+Create a `terraform.tfvars` file with your configuration:
 
-**Purpose**: Creates the foundational networking infrastructure
-
-**Features**:
-- Configurable VPC CIDR block
-- Public and private subnets across multiple AZs
-- Internet Gateway for public subnets
-- NAT Gateway for private subnets (optional)
-- Route tables and associations
-
-**Usage**:
 ```hcl
-module "vpc" {
-  source = "./modules/vpc"
-  
-  vpc_name = "prod-lamp-vpc"
-  cidr_block = "10.0.0.0/16"
-  
-  public_subnets = {
-    "public1" = { cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
-    "public2" = { cidr_block = "10.0.2.0/24", availability_zone = "us-east-1b" }
-  }
-  
-  private_subnets = {
-    "private1" = { cidr_block = "10.0.3.0/24", availability_zone = "us-east-1a" }
-    "private2" = { cidr_block = "10.0.4.0/24", availability_zone = "us-east-1b" }
-  }
-}
+environment = "prod"
+region = "us-east-1"
+db_password = "your-secure-password"
+ssh_ingress_cidr_blocks = ["203.0.113.0/24"] # Restrict to your IP
 ```
 
-### 2. Security Groups Module
+### 4. Review and Apply
 
-**Purpose**: Defines network security rules
-
-**Features**:
-- ALB security group (HTTP/HTTPS)
-- Web server security group (HTTP from ALB, SSH restricted)
-- Database security group (MySQL from web servers)
-
-**Usage**:
-```hcl
-module "security_groups" {
-  source = "./modules/security_groups"
-  
-  vpc_id = module.vpc.vpc_id
-  ssh_ingress_cidr_blocks = ["203.0.113.0/24"] # Restrict to your IP
-}
+```bash
+terraform plan
+terraform apply
 ```
 
-### 3. Database Module
+### 5. Access the Application
 
-**Purpose**: Deploys managed MySQL database
+After deployment completes, get the application URL:
 
-**Features**:
-- RDS MySQL instance
-- Configurable storage and instance class
-- Automatic backups
-- Private subnet placement
-- Secure password handling
-
-**Usage**:
-```hcl
-module "database" {
-  source = "./modules/database"
-  
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
-  security_group_ids = [module.security_groups.database_security_group_id]
-  
-  db_name = "lampdb"
-  username = "admin"
-  password = var.db_password # Pass via environment variable
-}
+```bash
+terraform output -raw alb_dns_name
 ```
 
-### 4. Auto Scaling Module
+## Module Documentation
 
-**Purpose**: Manages web server fleet
+The infrastructure is organized into reusable Terraform modules:
 
-**Features**:
-- Launch template with user data for LAMP stack
-- Auto scaling policies
-- Integration with ALB
-- Self-healing capabilities
-- Configurable scaling thresholds
+| Module | Description | Key Features |
+|--------|-------------|--------------|
+| `vpc` | Networking foundation | VPC, subnets, gateways, route tables |
+| `security_groups` | Network security | ALB, web, and database security groups |
+| `database` | Managed MySQL database | RDS instance, backups, private placement |
+| `auto_scaling` | Web server fleet | Launch template, scaling policies, self-healing |
+| `load_balancer` | Traffic distribution | ALB, target groups, health checks |
+| `monitoring` | Observability | CloudWatch alarms, SNS notifications |
 
-**Usage**:
-```hcl
-module "auto_scaling" {
-  source = "./modules/auto_scaling"
-  
-  vpc_zone_identifier = module.vpc.public_subnet_ids
-  security_group_ids = [module.security_groups.web_security_group_id]
-  target_group_arns = [module.load_balancer.target_group_arn]
-  
-  min_size = 2
-  max_size = 4
-  desired_capacity = 2
-  
-  db_host = module.database.db_instance_endpoint
-  db_name = module.database.db_instance_name
-  db_user = module.database.db_instance_username
-  db_password = var.db_password
-}
-```
+## Maintenance Guide
 
-### 5. Load Balancer Module
+### Scaling Operations
 
-**Purpose**: Distributes traffic to web servers
-
-**Features**:
-- Application Load Balancer
-- HTTP listener
-- Health checks
-- Target group configuration
-
-**Usage**:
-```hcl
-module "load_balancer" {
-  source = "./modules/load_balancer"
-  
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnet_ids
-  security_group_ids = [module.security_groups.alb_security_group_id]
-}
-```
-
-### 6. Monitoring Module
-
-**Purpose**: Implements observability
-
-**Features**:
-- CPU utilization alarms
-- ALB 5XX error monitoring
-- RDS performance alarms
-- SNS notifications
-
-**Usage**:
-```hcl
-module "monitoring" {
-  source = "./modules/monitoring"
-  
-  alb_arn = module.load_balancer.alb_arn
-  db_instance_id = module.database.db_instance_id
-  asg_name = module.auto_scaling.asg_name
-  alarm_email = "alerts@example.com"
-}
-```
-
-## Deployment Workflow
-
-1. Initialize Terraform:
-   ```bash
-   terraform init
-   ```
-
-2. Set required environment variables:
-   ```bash
-   export TF_VAR_db_password="your-secure-password"
-   ```
-
-3. Review execution plan:
-   ```bash
-   terraform plan
-   ```
-
-4. Deploy infrastructure:
-   ```bash
-   terraform apply
-   ```
-
-5. Access application:
-   ```bash
-   echo "Application URL: http://$(terraform output -raw alb_dns_name)"
-   ```
-
-## Maintenance
-
-### Scaling
-- Adjust `desired_capacity` in auto scaling module
-- Modify RDS instance class as needed
+- **Vertical Scaling**: Adjust `instance_type` for RDS or EC2 instances
+- **Horizontal Scaling**: Modify `min_size`, `max_size` in Auto Scaling Group
 
 ### Updates
-- Change `ami_name_filter` to update base image
-- Modify launch template version for configuration changes
+
+1. **AMI Updates**:
+   - Modify `ami_name_filter` in the auto scaling module
+   - Create new launch template version
+
+2. **Configuration Changes**:
+   - Update user data scripts
+   - Apply changes with `terraform apply`
+
+### Backup and Recovery
+
+- **Database Backups**: Managed by RDS with configurable retention
+- **Infrastructure State**: Back up Terraform state files
 
 ### Destruction
+
+To remove all resources:
+
 ```bash
 terraform destroy
 ```
 
 ## Best Practices
 
-1. **Secrets Management**: Use AWS Secrets Manager for database credentials
-2. **Backups**: Enable RDS automated backups with appropriate retention
-3. **Monitoring**: Set up detailed CloudWatch dashboards
-4. **CI/CD**: Integrate with pipeline for infrastructure updates
-5. **Tagging**: Consistently tag all resources for cost tracking
+1. **Security**:
+   - Rotate database credentials regularly
+   - Restrict SSH access to known IPs
+   - Enable VPC flow logs for traffic monitoring
+
+2. **Cost Optimization**:
+   - Use appropriate instance types
+   - Implement auto-scaling policies
+   - Clean up unused resources
+
+3. **Performance**:
+   - Configure appropriate scaling thresholds
+   - Enable RDS Performance Insights
+   - Implement caching where applicable
 
 ## Troubleshooting
 
-Common issues and solutions:
+| Issue | Investigation Steps | Resolution |
+|-------|----------------------|------------|
+| Web servers not registering with ALB | Check Auto Scaling Group events<br>Review target group health checks | Adjust health check settings<br>Verify security group rules |
+| Database connection failures | Verify security group rules<br>Check RDS connectivity from EC2 | Update security groups<br>Verify credentials |
+| Scaling not triggering | Review CloudWatch alarms<br>Check scaling policy metrics | Adjust scaling thresholds<br>Verify metric filters |
+| Application errors | Check Apache error logs<br>Review PHP application logs | Update application code<br>Adjust PHP configuration |
 
-1. **User Data Failures**:
-   - Check `/var/log/cloud-init-output.log`
-   - Verify Docker container logs: `docker logs php-app`
+## Support
 
-2. **Database Connection Issues**:
-   - Verify security group rules
-   - Check RDS connectivity from EC2 instances
+For additional assistance:
+- Refer to AWS documentation for LAMP stack best practices
+- Check Terraform registry for module examples
+- Review CloudWatch logs for detailed error information
 
-3. **Scaling Problems**:
-   - Review CloudWatch metrics
-   - Check Auto Scaling Group events
+## License
 
-For additional support, refer to AWS documentation or Terraform registry examples.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
