@@ -4,6 +4,9 @@
 
 This Terraform project provides modular infrastructure for deploying a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS. The infrastructure is divided into reusable modules that can be composed together.
 
+
+![Architecture](media/lampstack_design.png)
+
 ## Module Structure
 
 ```
