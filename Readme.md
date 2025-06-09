@@ -53,8 +53,8 @@ The solution consists of the following core components:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/lamp-stack-aws.git
-cd lamp-stack-aws
+git clone https://github.com/guderian120/lamp_stack_infranstructure
+cd lamp_stack_infranstructure
 ```
 
 ### 2. Initialize Terraform
@@ -153,10 +153,12 @@ terraform destroy
 
 | Issue | Investigation Steps | Resolution |
 |-------|----------------------|------------|
+| Terraform Errors | Check the main.tf file, defualt profile is set to sandbox | comment out the sandbox profile |
 | Web servers not registering with ALB | Check Auto Scaling Group events<br>Review target group health checks | Adjust health check settings<br>Verify security group rules |
 | Database connection failures | Verify security group rules<br>Check RDS connectivity from EC2 | Update security groups<br>Verify credentials |
 | Scaling not triggering | Review CloudWatch alarms<br>Check scaling policy metrics | Adjust scaling thresholds<br>Verify metric filters |
 | Application errors | Check Apache error logs<br>Review PHP application logs | Update application code<br>Adjust PHP configuration |
+
 
 ## Support
 
