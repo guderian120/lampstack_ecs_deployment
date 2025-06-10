@@ -22,6 +22,7 @@ variable "asg_name" {
 variable "alarm_email" {
   description = "Email address for notifications"
   type        = string
+  
 }
 
 variable "tags" {

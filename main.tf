@@ -1,3 +1,22 @@
+terraform {
+  cloud {
+    organization = "kryotech"
+
+    workspaces {
+      name = "lamp_stack_infranstructure"
+    }
+  }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+
+
 provider "aws" {
   region = "eu-west-1"
   # profile = "sandbox"
@@ -175,7 +194,7 @@ module "monitoring" {
   alb_arn        = module.load_balancer.alb_arn
   db_instance_id = module.database.db_instance_id
   asg_name       = module.auto_scaling.asg_name
-  alarm_email    = "alerts@example.com"
+  alarm_email    = "realamponsah10@yahoo.com"
 
   tags = {
     Environment = "production"
