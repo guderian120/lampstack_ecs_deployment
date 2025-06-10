@@ -25,6 +25,14 @@
 
 This Terraform project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS, with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes.
 
+## 🔗 Live Deployment
+
+The application is currently deployed and accessible at:  
+[Live Demo](http://myltemplate-asg-1466786066.eu-west-1.elb.amazonaws.com/index.php)
+
+[![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://myltemplate-asg-1466786066.eu-west-1.elb.amazonaws.com/index.php)
+
+
 ![Architecture](media/lampstack_design.png)
 
 ## Key Features <a name="key-features"></a>
