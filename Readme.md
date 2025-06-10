@@ -18,6 +18,8 @@
 11. [Support](#support)
 
 ---
+![Demo](media/lamp_demo.gif)
+
 
 ## Project Overview <a name="project-overview"></a>
 
