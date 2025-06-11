@@ -153,7 +153,7 @@ module "load_balancer" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.public_subnet_ids
   security_group_ids = [module.security_groups.alb_security_group_id]
-  autoscaling_group_name = module.autoscaling.asg_name
+  autoscaling_group_name = module.auto_scaling.asg_name
   
   tags = {
     Environment = "production"
