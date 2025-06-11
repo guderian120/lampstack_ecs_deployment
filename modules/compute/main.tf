@@ -30,15 +30,3 @@ resource "aws_instance" "this" {
   }
 }
 
-resource "aws_eip" "this" {
-  count    = var.instance_count
-  instance = aws_instance.this[count.index].id
-  domain   = "vpc"
-
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.name_prefix}-eip-${count.index + 1}"
-    }
-  )
-}
