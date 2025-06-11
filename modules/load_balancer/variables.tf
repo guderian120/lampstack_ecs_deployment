@@ -19,9 +19,14 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-variable "target_instance_ids" {
-  description = "List of target instance IDs for the ALB"
-  type        = list(string)
+# variable "target_instance_ids" {
+#   description = "List of target instance IDs for the ALB"
+#   type        = list(string)
+# }
+
+variable "autoscaling_group_name" {
+  type        = string
+  description = "Name of the Auto Scaling Group to attach to the target group"
 }
 
 variable "tags" {

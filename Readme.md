@@ -28,10 +28,10 @@ This Terraform project automates the deployment of a highly available LAMP (Linu
 ## 🔗 Live Deployment
 
 The application is currently deployed and accessible at:  
-[Live Demo](http://myltemplate-asg-1466786066.eu-west-1.elb.amazonaws.com/index.php)
-
 [![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://myltemplate-asg-1466786066.eu-west-1.elb.amazonaws.com/index.php)
 
+## Resource Map
+![Resource Map](media/alb_resource_map.png)
 
 ![Architecture](media/lampstack_design.png)
 

@@ -116,25 +116,25 @@ module "database" {
 }
 
 # Compute Module
-module "compute" {
-  source = "./modules/compute"
+# module "compute" {
+#   source = "./modules/compute"
 
-  name_prefix   = "prod-lamp-web"
-  instance_count = 1
-  subnet_ids    = module.vpc.private_subnet_ids
-  security_group_ids = [module.security_groups.web_security_group_id]
-  key_name      = "my-key-pair" # Your existing key pair
+#   name_prefix   = "prod-lamp-web"
+#   instance_count = 1
+#   subnet_ids    = module.vpc.private_subnet_ids
+#   security_group_ids = [module.security_groups.web_security_group_id]
+#   key_name      = "my-key-pair" # Your existing key pair
   
-  db_host     = module.database.db_instance_endpoint
-  db_name     = module.database.db_instance_name
-  db_user     = module.database.db_instance_username
-  db_password =  var.db_password # Pass this via variables or environment
+#   db_host     = module.database.db_instance_endpoint
+#   db_name     = module.database.db_instance_name
+#   db_user     = module.database.db_instance_username
+#   db_password =  var.db_password # Pass this via variables or environment
   
-  tags = {
-    Environment = "production"
-    Project     = "lamp-stack"
-  }
-}
+#   tags = {
+#     Environment = "production"
+#     Project     = "lamp-stack"
+#   }
+# }
 
 # Outputs
 output "db_endpoint" {
@@ -153,8 +153,8 @@ module "load_balancer" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.public_subnet_ids
   security_group_ids = [module.security_groups.alb_security_group_id]
-  target_instance_ids = module.compute.instance_ids
-
+  autoscaling_group_name = module.autoscaling.asg_name
+  
   tags = {
     Environment = "production"
     Project     = "lamp-stack"
