@@ -142,9 +142,9 @@ output "db_endpoint" {
   sensitive = true
 }
 
-output "web_instance_public_ips" {
-  value = module.compute.instance_public_ips
-}
+# output "web_instance_public_ips" {
+#   value = module.compute.instance_public_ips
+# }
 
 module "load_balancer" {
   source = "./modules/load_balancer"
