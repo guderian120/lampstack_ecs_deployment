@@ -18,6 +18,8 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+central_logging/*
+
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 *.tfplan
 security/*
