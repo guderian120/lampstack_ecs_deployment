@@ -71,11 +71,24 @@ variable "max_size" {
 variable "desired_capacity" {
   description = "Desired number of instances"
   type        = number
-  default     = 2
+  default     = 1
+}
+
+variable "iam_instance_profile_name" {
+  description = "IAM instance profile name for the ASG instances"
+  type        = string
+  
 }
 
 variable "tags" {
   description = "Additional tags"
   type        = map(string)
   default     = {}
+}
+
+
+
+variable "region" {
+  description = "AWS region"
+  type        = string
 }

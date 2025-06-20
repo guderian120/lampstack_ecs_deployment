@@ -1,25 +1,25 @@
-terraform {
-  cloud {
-    organization = "kryotech"
+# terraform {
+#   cloud {
+#     organization = "kryotech"
 
-    workspaces {
-      name = "lamp_stack_infranstructure"
-    }
-  }
+#     workspaces {
+#       name = "lamp_stack_infranstructure"
+#     }
+#   }
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = "~> 5.0"
+#     }
+#   }
+# }
 
 
 
 provider "aws" {
   region = "eu-west-1"
-  # profile = "sandbox"
+  profile = "sandbox"
 }
 
 module "vpc" {
@@ -96,6 +96,10 @@ output "database_security_group_id" {
   value = module.security_groups.database_security_group_id
 }
 
+output "dashboard_url" {
+  value = module.monitoring.dashboard_url
+  description = "URL of the CloudWatch dashboard for monitoring"
+}
 
 # Database Module
 module "database" {
@@ -123,7 +127,7 @@ output "db_endpoint" {
 }
 
 
-module "load_balancer" {
+module "load_balancer" { 
   source = "./modules/load_balancer"
 
   name_prefix        = "prod-lamp-alb"
@@ -138,6 +142,9 @@ module "load_balancer" {
   }
 }
 
+
+
+
 module "auto_scaling" {
   source = "./modules/auto_scaling"
 
@@ -145,18 +152,19 @@ module "auto_scaling" {
   ami_id             = "ami-03400c3b73b5086e9" # Amazon Linux 2
   instance_type      = "t2.nano"
   vpc_zone_identifier = module.vpc.private_subnet_ids
-  security_group_ids = [module.security_groups.web_security_group_id]
+  security_group_ids = [module.security_groups.web_security_group_id,]
   target_group_arns  = [module.load_balancer.target_group_arn]
   key_name           = "my-key-pair"
-
+  region = "eu-west-1"
   db_host     = module.database.db_instance_endpoint
   db_name     = module.database.db_instance_name
   db_user     = module.database.db_instance_username
   db_password = var.db_password
+  iam_instance_profile_name = module.monitoring.monitoring_instance_profile
 
-  min_size         = 2
+  min_size         = 1
   max_size         = 4
-  desired_capacity = 2
+  desired_capacity = 1
 
   tags = {
     Environment = "production"
@@ -168,12 +176,15 @@ module "monitoring" {
   source = "./modules/monitoring"
 
   name_prefix    = "prod-lamp-mon"
-  alb_arn        = module.load_balancer.alb_arn
-  db_instance_id = module.database.db_instance_id
+  db_instance_id = module.database.db_instance_identifier
   asg_name       = module.auto_scaling.asg_name
   alarm_email    = "realamponsah10@yahoo.com"
-
-  tags = {
+  region = "eu-west-1"
+  public_subnet_ids = module.vpc.public_subnet_ids
+  alb_arn_suffix = module.load_balancer.alb_arn_suffix
+  vpc_id = module.vpc.vpc_id
+  ssh_ingress_cidr_blocks = ["0.0.0.0/0"]
+    tags = {
     Environment = "production"
     Project     = "lamp-stack"
   }

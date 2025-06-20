@@ -13,6 +13,12 @@ output "launch_template_id" {
   value       = aws_launch_template.this.id
 }
 
+output "ec2_instance_role" {
+  description = "The IAM role attached to the EC2 instances in the Auto Scaling Group"
+  value       = aws_iam_role.asg_role.name
+  
+}
+
 output "launch_template_latest_version" {
   description = "The latest version of the Launch Template"
   value       = aws_launch_template.this.latest_version

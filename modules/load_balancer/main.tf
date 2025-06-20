@@ -6,6 +6,7 @@ resource "aws_lb" "this" {
   subnets            = var.subnet_ids
 
   enable_deletion_protection = false
+  
 
   tags = merge(
     var.tags,
