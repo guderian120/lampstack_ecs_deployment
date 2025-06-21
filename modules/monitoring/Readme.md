@@ -5,7 +5,7 @@ This document details the development, implementation, and integration of a moni
 
 ### Dashboard View
 
- ![Dashboard View](media/monitoring_video.gif.gif)
+ ![Dashboard Image](media/monitoring_dash.gif)
 
 ### Visit Dashboard 
 [Public Cloudwatch Dashboard](https://cloudwatch.amazonaws.com/dashboard.html?dashboard=prod-lamp-mon-lamp-stack-dashboard&context=eyJSIjoidXMtZWFzdC0xIiwiRCI6ImN3LWRiLTI4ODc2MTc0MzkyNCIsIlUiOiJ1cy1lYXN0LTFfeDNuUXJMb0h3IiwiQyI6IjJhamg2Z2VkOGh0bnI0ZXZxOWtyN2duMnEzIiwiSSI6InVzLWVhc3QtMTozNjhhM2Q0MS1kZGQ0LTQ1NzItYTMxMi03ODI1MDlhYjdkOTkiLCJPIjoiYXJuOmF3czppYW06OjI4ODc2MTc0MzkyNDpyb2xlL3NlcnZpY2Utcm9sZS9DV0RCU2hhcmluZy1QdWJsaWNSZWFkT25seUFjY2Vzcy05RFkzRzFMOCIsIk0iOiJQdWJsaWMifQ==&start=PT3H&end=null)
@@ -62,6 +62,7 @@ The monitoring module enhances the LAMP stack infrastructure with:
 - **Centralized Logging**: CloudWatch Logs aggregates Apache access/error logs, Docker container logs, and custom metrics logs.
 - **Visualization**: A CloudWatch Dashboard provides real-time insights into EC2, RDS, and ALB performance.
 - **Alerting**: CloudWatch Alarms monitor critical thresholds (e.g., high CPU, ALB errors) and notify via SNS email subscriptions.
+![Centralized logs](media/consolidated_logs.png)
 
 ### Module Structure
 The monitoring module is located in the `modules/monitoring` directory. Key files include:
