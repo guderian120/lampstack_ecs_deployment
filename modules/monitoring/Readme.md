@@ -62,6 +62,8 @@ The monitoring module enhances the LAMP stack infrastructure with:
 - **Centralized Logging**: CloudWatch Logs aggregates Apache access/error logs, Docker container logs, and custom metrics logs.
 - **Visualization**: A CloudWatch Dashboard provides real-time insights into EC2, RDS, and ALB performance.
 - **Alerting**: CloudWatch Alarms monitor critical thresholds (e.g., high CPU, ALB errors) and notify via SNS email subscriptions.
+
+### Central Logging
 ![Centralized logs](media/consolidated_logs.png)
 
 ### Module Structure
