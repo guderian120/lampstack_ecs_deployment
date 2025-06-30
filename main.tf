@@ -1,19 +1,19 @@
-# terraform {
-#   cloud {
-#     organization = "kryotech"
+terraform {
+  cloud {
+    organization = "kryotech"
 
-#     workspaces {
-#       name = "lamp_stack_infranstructure"
-#     }
-#   }
+    workspaces {
+      name = "lamp_stack_infranstructure"
+    }
+  }
 
-#   required_providers {
-#     aws = {
-#       source  = "hashicorp/aws"
-#       version = "~> 5.0"
-#     }
-#   }
-# }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 
 
