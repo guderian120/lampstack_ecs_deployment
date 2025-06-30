@@ -27,7 +27,7 @@ security
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-*plan*
+*plan* 
 # Ignore provider plugins
 .terraform.lock.hcl
 
