@@ -1,4 +1,5 @@
-# LAMP Stack Deployment on AWS with Terraform Cloud CI/CD
+
+# LAMP Stack Deployment on AWS with ECS and ALB
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
@@ -20,10 +21,9 @@
 ---
 ![Demo](media/lamp_demo.gif)
 
-
 ## Project Overview <a name="project-overview"></a>
 
-This Terraform project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS, with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes.
+This project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS ECS (Elastic Container Service), with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes.
 
 ## 🔗 Live Deployment
 
@@ -33,17 +33,18 @@ The application is currently deployed and accessible at:
 ## Resource Map
 ![Resource Map](media/alb_resource_map.png)
 
-![Architecture](media/lampstack_design.png)
+![Architecture](media/ecs_architecture.png)
 
 ## Key Features <a name="key-features"></a>
 
 - **Terraform Cloud CI/CD**: Automatic plan and apply on code pushes
-- **Highly Available Architecture**: Multi-AZ deployment
+- **Highly Available Architecture**: Multi-AZ deployment with ECS
+- **Containerized Workloads**: Dockerized LAMP stack deployment
 - **GitOps Workflow**: Infrastructure changes via Git repository
 - **Remote State Management**: Secure state storage in Terraform Cloud
-- **Collaboration Features**: Run history, notifications, and team management
-- **Auto-scaling Web Tier**: Automatic scaling of web servers
+- **Auto-scaling Service**: ECS Service with application auto-scaling
 - **Managed Database**: Amazon RDS MySQL with automated backups
+- **Secure Networking**: ECS tasks in private subnets with ALB ingress
 - **Comprehensive Monitoring**: CloudWatch alarms and SNS notifications
 
 ## Prerequisites <a name="prerequisites"></a>
@@ -57,11 +58,12 @@ The application is currently deployed and accessible at:
 - AWS account with administrator permissions
 - IAM user with programmatic access
 - AWS CLI v2 installed
+- ECR repository for container images
 
 ### Local Development Requirements
 - Terraform v1.0+ installed
+- Docker installed for local container testing
 - Git client
-- SSH key pair for EC2 access
 - Text editor (VS Code recommended)
 
 ## Local Development Setup <a name="local-development-setup"></a>
@@ -75,7 +77,7 @@ The application is currently deployed and accessible at:
    - Select "Version control workflow"
    - Connect your VCS provider (GitHub/GitLab/Bitbucket)
    - Choose your repository containing this project
-   - Set workspace name (e.g., "prod-lamp-stack")
+   - Set workspace name (e.g., "prod-ecs-lamp-stack")
 
 2. **Configure Workspace Variables**
    Add these variables in your Terraform Cloud workspace:
@@ -85,8 +87,8 @@ The application is currently deployed and accessible at:
    | `AWS_ACCESS_KEY_ID` | Environment | Your AWS access key |
    | `AWS_SECRET_ACCESS_KEY` | Environment | Your AWS secret key |
    | `TF_VAR_db_password` | Terraform | Database password (mark as sensitive) |
-   | `TF_VAR_ssh_ingress_cidr` | Terraform | Allowed SSH CIDR blocks |
    | `TF_VAR_region` | Terraform | AWS region (e.g., "us-east-1") |
+   | `TF_VAR_ecr_repository_url` | Terraform | ECR repository URL for container images |
 
 3. **Configure Execution Settings**
    - Set execution mode to "Remote"
@@ -97,7 +99,7 @@ The application is currently deployed and accessible at:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/guderian120/lamp_stack_infranstructure
+   git clone -b ecs-feature https://github.com/guderian120/lamp_stack_infranstructure
    cd lamp_stack_infranstructure
    ```
 
@@ -109,24 +111,32 @@ The application is currently deployed and accessible at:
        organization = "your-org-name"
        
        workspaces {
-         name = "prod-lamp-stack"
+         name = "prod-ecs-lamp-stack"
        }
      }
    }
    ```
 
-3. **Initialize Terraform**
+3. **Build and Push Docker Image**
+   ```bash
+   docker build -t lamp-stack ./docker
+   aws ecr get-login-password | docker login --username AWS --password-stdin YOUR_ECR_URL
+   docker tag lamp-stack:latest YOUR_ECR_URL/lamp-stack:latest
+   docker push YOUR_ECR_URL/lamp-stack:latest
+   ```
+
+4. **Initialize Terraform**
    ```bash
    terraform init
    ```
 
-4. **Configure Local Variables**
+5. **Configure Local Variables**
    Create a `terraform.tfvars` file with your configuration:
    ```hcl
    environment = "prod"
    region = "us-east-1"
    db_password = "your-secure-password"
-   ssh_ingress_cidr_blocks = ["203.0.113.0/24"] # Restrict to your IP
+   ecr_repository_url = "your-account-id.dkr.ecr.region.amazonaws.com/your-repo"
    ```
 
 ## Architecture Components <a name="architecture-components"></a>
@@ -139,8 +149,8 @@ The solution consists of the following core components:
    - Route tables for traffic management
 
 2. **Compute Layer**:
-   - Auto Scaling Group for web servers
-   - Launch template with LAMP stack bootstrap
+   - ECS Cluster with Fargate launch type
+   - ECS Service with task definition for LAMP stack
    - Application Load Balancer with health checks
 
 3. **Data Layer**:
@@ -150,10 +160,12 @@ The solution consists of the following core components:
 4. **Security Layer**:
    - Security groups restricting traffic flow
    - IAM roles with least privilege
+   - ECS tasks running in private subnets
 
 5. **Monitoring Layer**:
    - CloudWatch alarms for performance metrics
    - SNS notifications for critical events
+   - Container insights for ECS monitoring
 
 ## Deployment Workflows <a name="deployment-workflows"></a>
 
@@ -166,26 +178,25 @@ The solution consists of the following core components:
    - Manual approval required (unless auto-apply enabled)
    - Changes are deployed to AWS
 
-2. **Pull Request Workflow**
-   - Plan runs automatically on pull requests
-   - Team reviews plan output in Terraform Cloud
-   - Approved changes merged to main branch
-   - Automatic apply runs (if configured)
+2. **Image Update Workflow**
+   - Update Docker image and push to ECR
+   - Update `container_image` variable in Terraform
+   - Terraform Cloud triggers deployment of new task definition
 
 ### Local Deployment <a name="local-deployment"></a>
 
 1. **Development Workflow**
    ```bash
    # Create feature branch
-   git checkout -b feature/new-config
+   git checkout -b feature/ecs-update
    
    # Make changes and test locally
    terraform plan
    
    # Commit and push changes
    git add .
-   git commit -m "Add new security group rules"
-   git push origin feature/new-config
+   git commit -m "Update ECS task memory limits"
+   git push origin feature/ecs-update
    ```
 
 2. **Apply Changes**
@@ -209,25 +220,25 @@ The infrastructure is organized into reusable Terraform modules:
 | Module | Description | Key Features |
 |--------|-------------|--------------|
 | `vpc` | Networking foundation | VPC, subnets, gateways, route tables |
-| `security_groups` | Network security | ALB, web, and database security groups |
+| `security_groups` | Network security | ALB, ECS, and database security groups |
 | `database` | Managed MySQL database | RDS instance, backups, private placement |
-| `auto_scaling` | Web server fleet | Launch template, scaling policies, self-healing |
+| `ecs` | Container orchestration | Cluster, service, task definition, scaling |
 | `load_balancer` | Traffic distribution | ALB, target groups, health checks |
 | `monitoring` | Observability | CloudWatch alarms, SNS notifications |
 
 ## Maintenance Guide <a name="maintenance-guide"></a>
 
 ### Scaling Operations
-- **Vertical Scaling**: Adjust `instance_type` for RDS or EC2 instances
-- **Horizontal Scaling**: Modify `min_size`, `max_size` in Auto Scaling Group
+- **Service Scaling**: Adjust `desired_count` or configure auto-scaling policies
+- **Task Resources**: Modify CPU/memory in task definition
 
 ### Updates
-1. **AMI Updates**:
-   - Modify `ami_name_filter` in the auto scaling module
-   - Create new launch template version
+1. **Container Updates**:
+   - Push new image to ECR
+   - Update `container_image` tag in variables
 
 2. **Configuration Changes**:
-   - Update user data scripts
+   - Update task definition parameters
    - Apply changes through Terraform Cloud CI/CD
 
 ### Backup and Recovery
@@ -248,11 +259,11 @@ To remove all resources through Terraform Cloud:
 
 2. **CI/CD Optimization**:
    - Separate workspaces for dev/stage/prod
-   - Use cost estimation features
-   - Implement pre-commit hooks for validation
+   - Implement image scanning in ECR
+   - Use pre-commit hooks for validation
 
 3. **Cost Management**:
-   - Use appropriate instance types
+   - Right-size Fargate task resources
    - Implement auto-scaling policies
    - Clean up unused resources
 
@@ -260,17 +271,17 @@ To remove all resources through Terraform Cloud:
 
 | Issue | Solution |
 |-------|----------|
-| Terraform Errors | Check the main.tf file, default profile is set to sandbox | Comment out the sandbox profile |
+| ECS tasks not starting | Check task definition and CloudWatch logs |
+| ALB health check failures | Verify container health check endpoint |
+| Terraform Errors | Check the main.tf file for configuration issues |
 | Runs not triggering | Verify VCS connection in Terraform Cloud |
 | Authentication errors | Verify AWS credentials in workspace variables |
-| State conflicts | Use Terraform Cloud's state locking |
-| Module errors | Verify module versions and compatibility |
 
 ## Support <a name="support"></a>
 
 For additional assistance:
 - [Terraform Cloud Documentation](https://www.terraform.io/docs/cloud)
-- [AWS LAMP Stack Best Practices](https://docs.aws.amazon.com/)
+- [AWS ECS Best Practices](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/best-practices.html)
 - Repository Issues: https://github.com/guderian120/lamp_stack_infranstructure/issues
 
 For production deployments, consider HashiCorp's paid support options for Terraform Cloud.
