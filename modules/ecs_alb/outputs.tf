@@ -1,7 +1,9 @@
 output "ecs_security_group" {
   value = aws_security_group.ecs
 }
-
+output "alb_security_group" {
+  value = aws_security_group.alb
+}
 output "target_group_arn" {
   value = aws_lb_target_group.ecs.arn
 }

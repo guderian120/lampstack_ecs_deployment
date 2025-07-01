@@ -1,19 +1,19 @@
-terraform {
-  cloud {
-    organization = "kryotech"
+# terraform {
+#   cloud {
+#     organization = "kryotech"
 
-    workspaces {
-      name = "lamp_stack_infranstructure"
-    }
-  }
+#     workspaces {
+#       name = "lamp_stack_infranstructure"
+#     }
+#   }
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = "~> 5.0"
+#     }
+#   }
+# }
 
 
 
@@ -108,7 +108,7 @@ module "database" {
   name_prefix        = "prod-lamp-db"
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.vpc.private_subnet_ids
-  security_group_ids = [module.security_groups.database_security_group_id]
+  security_group_ids = [module.security_groups.database_security_group_id, module.ecs_alb.alb_security_group.id]
 
   username = "admin"
   password = var.db_password # Pass this via variables or environment
