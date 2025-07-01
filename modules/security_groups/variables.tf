@@ -6,7 +6,7 @@ variable "vpc_id" {
 variable "name_prefix" {
   description = "Prefix to be used in resource names"
   type        = string
-  default     = "lamp-stack"
+  default     = "ecs-stack"
 }
 
 variable "tags" {
@@ -15,6 +15,9 @@ variable "tags" {
   default     = {}
 }
 
+variable "ecs_security_group" {
+  description = "ecs security group"
+}
 variable "web_ingress_cidr_blocks" {
   description = "CIDR blocks allowed to access web ports (HTTP/HTTPS)"
   type        = list(string)

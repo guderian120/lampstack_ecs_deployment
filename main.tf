@@ -3,7 +3,7 @@
 #     organization = "kryotech"
 
 #     workspaces {
-#       name = "lamp_stack_infranstructure"
+#       name = "ecs_stack_infranstructure"
 #     }
 #   }
 
@@ -26,7 +26,7 @@ module "vpc" {
   source = "./modules/vpc"
 
   # Customize these values as needed
-  vpc_name   = "lamp-production-vpc"
+  vpc_name   = "ecs-production-vpc"
   cidr_block = "10.0.0.0/16"
 
   # You can override the default subnets if needed
@@ -54,7 +54,7 @@ module "vpc" {
 
   tags = {
     Environment = "production"
-    Project     = "lamp-stack"
+    Project     = "ecs-stack"
   }
 }
 
@@ -73,18 +73,18 @@ output "private_subnet_ids" {
 
 module "security_groups" {
   source = "./modules/security_groups"
-
+  ecs_security_group = module.ecs_alb.ecs_security_group
   vpc_id = module.vpc.vpc_id
 
   # Customize these as needed
-  name_prefix = "prod-lamp"
+  name_prefix = "prod-ecs"
 
   # Restrict SSH access in production!
   ssh_ingress_cidr_blocks = ["203.0.113.0/24"] # Replace with your IP
 
   tags = {
     Environment = "production"
-    Project     = "lamp-stack"
+    Project     = "ecs-stack"
   }
 }
 
@@ -105,7 +105,7 @@ output "database_security_group_id" {
 module "database" {
   source = "./modules/database"
 
-  name_prefix        = "prod-lamp-db"
+  name_prefix        = "prod-ecs-db"
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.vpc.private_subnet_ids
   security_group_ids = [module.security_groups.database_security_group_id, module.ecs_alb.alb_security_group.id]
@@ -115,7 +115,7 @@ module "database" {
 
   tags = {
     Environment = "production"
-    Project     = "lamp-stack"
+    Project     = "ecs-stack"
   }
 }
 
@@ -130,7 +130,7 @@ output "db_endpoint" {
 # module "load_balancer" {
 #   source = "./modules/load_balancer"
 
-#   name_prefix            = "prod-lamp-alb"
+#   name_prefix            = "prod-ecs-alb"
 #   vpc_id                 = module.vpc.vpc_id
 #   subnet_ids             = module.vpc.public_subnet_ids
 #   security_group_ids     = [module.security_groups.alb_security_group_id]
@@ -138,7 +138,7 @@ output "db_endpoint" {
 
 #   tags = {
 #     Environment = "production"
-#     Project     = "lamp-stack"
+#     Project     = "ecs-stack"
 #   }
 # }
 
@@ -148,7 +148,7 @@ output "db_endpoint" {
 # module "auto_scaling" {
 #   source = "./modules/auto_scaling"
 
-#   name_prefix               = "prod-lamp-asg"
+#   name_prefix               = "prod-ecs-asg"
 #   ami_id                    = "ami-03400c3b73b5086e9" # Amazon Linux 2
 #   instance_type             = "t2.nano"
 #   vpc_zone_identifier       = module.vpc.private_subnet_ids
@@ -168,17 +168,17 @@ output "db_endpoint" {
 
 #   tags = {
 #     Environment = "production"
-#     Project     = "lamp-stack"
+#     Project     = "ecs-stack"
 #   }
 # }
 
 # module "monitoring" {
 #   source = "./modules/monitoring"
 
-#   name_prefix             = "prod-lamp-mon"
+#   name_prefix             = "prod-ecs-mon"
 #   db_instance_id          = module.database.db_instance_identifier
 #   asg_name                = module.auto_scaling.asg_name
-#   alarm_email             = "realamponsah10@yahoo.com"
+#   alarm_email             = "reaecsonsah10@yahoo.com"
 #   region                  = "eu-west-1"
 #   public_subnet_ids       = module.vpc.public_subnet_ids
 #   alb_arn_suffix          = module.load_balancer.alb_arn_suffix
@@ -186,7 +186,7 @@ output "db_endpoint" {
 #   ssh_ingress_cidr_blocks = ["0.0.0.0/0"]
 #   tags = {
 #     Environment = "production"
-#     Project     = "lamp-stack"
+#     Project     = "ecs-stack"
 #   }
 # }
 
@@ -194,7 +194,7 @@ output "db_endpoint" {
 module "ecs_alb" {
   source = "./modules/ecs_alb"
 
-  app_name       = "lampstack"
+  app_name       = "ecsstack"
   vpc_id         = module.vpc.vpc_id
   public_subnets = module.vpc.public_subnet_ids
   container_port = 80
@@ -212,7 +212,7 @@ module "ecs" {
   target_group_arn        = module.ecs_alb.target_group_arn
   ecs_task_execution_role = module.ecs_alb.ecs_task_execution_role
   log_group = module.ecs_alb.ecs_log_group
-  app_name                = "lampstack" 
+  app_name                = "ecsstack" 
   region                  = "eu-west-1"
   container_port          = 80
   host_port               = 80

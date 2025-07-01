@@ -1,7 +1,7 @@
 variable "vpc_name" {
-  description = "Lampstack Vpc"
+  description = "ecsstack Vpc"
   type        = string
-  default     = "lamp-stack-vpc"
+  default     = "ecs-stack-vpc"
 }
 
 variable "cidr_block" {
