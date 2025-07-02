@@ -23,17 +23,17 @@
 
 ## Project Overview <a name="project-overview"></a>
 
-This project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS ECS (Elastic Container Service), with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes.
+This project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS ECS (Elastic Container Service), with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes. For detailed documentations on the PHP source code visit [![PHP DOCS](https://img.shields.io/badge/-Live%20Demo-green?style=for-the-badge)](https://github.com/guderian120/lamp_stack_application)
+
 
 ## 🔗 Live Deployment
 
 The application is currently deployed and accessible at:  
-[![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://prod-lamp-alb-596899484.eu-west-1.elb.amazonaws.com/index.php)
+[![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://ecsstack-alb-856037561.eu-west-1.elb.amazonaws.com/index.php)
 
 ## Resource Map
-![Resource Map](media/alb_resource_map.png)
+![Resource Map](media/ecs_resource_map.png)
 
-![Architecture](media/ecs_architecture.png)
 
 ## Key Features <a name="key-features"></a>
 
@@ -119,6 +119,9 @@ The application is currently deployed and accessible at:
 
 3. **Build and Push Docker Image**
    ```bash
+   cd .. # come out of the terraform configurations folder
+   git clone https://github.com/guderian120/lamp_stack_application #clone the php code
+   cd lamp_stack_application
    docker build -t lamp-stack ./docker
    aws ecr get-login-password | docker login --username AWS --password-stdin YOUR_ECR_URL
    docker tag lamp-stack:latest YOUR_ECR_URL/lamp-stack:latest
@@ -127,14 +130,16 @@ The application is currently deployed and accessible at:
 
 4. **Initialize Terraform**
    ```bash
-   terraform init
+   cd .. # come out of the php code directory
+   cd lampstack_infranstructure # enter the terraform configurations folder
+   terraform init #initialize the directory
    ```
 
 5. **Configure Local Variables**
    Create a `terraform.tfvars` file with your configuration:
    ```hcl
    environment = "prod"
-   region = "us-east-1"
+   region = "eu-west-1"
    db_password = "your-secure-password"
    ecr_repository_url = "your-account-id.dkr.ecr.region.amazonaws.com/your-repo"
    ```

@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "task" {
 
   container_definitions = jsonencode([{
     name      = "${var.app_name}-container"
-    image     = "288761743924.dkr.ecr.eu-west-1.amazonaws.com/lampstack:latest"
+    image     = var.ecr_repository_url
     essential = true
     portMappings = [{
       containerPort = var.container_port

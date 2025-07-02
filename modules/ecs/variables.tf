@@ -35,6 +35,11 @@ variable "db_host" {
   type        = string
 }
 
+variable "ecr_repository_url" {
+  description = "ecr repository url"  
+  type = string
+  
+}
 variable "db_name" {
   description = "Database name"
   type        = string

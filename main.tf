@@ -207,6 +207,7 @@ module "ecs" {
 
   private_subnets = module.vpc.private_subnet_ids
   alb_listener    = module.ecs_alb.alb_listener
+  ecr_repository_url = var.ecr_repository_url
   # Application-specific variables 
   security_group          = module.ecs_alb.ecs_security_group
   target_group_arn        = module.ecs_alb.target_group_arn

@@ -3,3 +3,8 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "ecr_repository_url"{
+  description = "ecr repository url"
+  type = string
+}
