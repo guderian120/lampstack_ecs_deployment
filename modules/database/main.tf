@@ -7,7 +7,7 @@ resource "aws_db_subnet_group" "this" {
     {
       Name = "${var.name_prefix}-subnet-group"
     }
-  )
+  ) 
 }
 
 resource "aws_db_instance" "this" {
