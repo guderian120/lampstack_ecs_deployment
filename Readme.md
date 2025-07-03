@@ -23,7 +23,7 @@
 
 ## Project Overview <a name="project-overview"></a>
 
-This project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS ECS (Elastic Container Service), with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes. For detailed documentations on the PHP source code visit [![PHP DOCS](https://img.shields.io/badge/-Live%20Demo-green?style=for-the-badge)](https://github.com/guderian120/lamp_stack_application)
+This project automates the deployment of a highly available LAMP (Linux, Apache, MySQL, PHP) stack on AWS ECS (Elastic Container Service), with integrated CI/CD through Terraform Cloud. The infrastructure follows AWS Well-Architected Framework principles and features automatic deployments on code changes. For detailed documentations on the PHP source code visit [![PHP DOCS](https://img.shields.io/badge/-Php%20Docks-green?style=for-the-badge)](https://github.com/guderian120/lamp_stack_application)
 
 
 ## 🔗 Live Deployment
