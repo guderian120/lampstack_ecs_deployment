@@ -29,7 +29,7 @@ This project automates the deployment of a highly available LAMP (Linux, Apache,
 ## 🔗 Live Deployment
 
 The application is currently deployed and accessible at:  
-[![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://ecsstack-alb-856037561.eu-west-1.elb.amazonaws.com/index.php)
+[![Live Demo](https://img.shields.io/badge/-Live%20Demo-blue?style=for-the-badge)](http://ecsstack-alb-860145636.eu-west-1.elb.amazonaws.com/index.php)
 
 ## Resource Map
 ![Resource Map](media/ecs_resource_map.png)
