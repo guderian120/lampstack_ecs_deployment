@@ -8,16 +8,15 @@ variable "name_prefix" {
   type        = string
   default     = "ecs-stack"
 }
-
+variable "ecs_security_group" {
+  description = "Security group for ecs"
+}
 variable "tags" {
   description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
 
-variable "ecs_security_group" {
-  description = "ecs security group"
-}
 variable "web_ingress_cidr_blocks" {
   description = "CIDR blocks allowed to access web ports (HTTP/HTTPS)"
   type        = list(string)

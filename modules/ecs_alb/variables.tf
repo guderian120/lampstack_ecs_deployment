@@ -22,3 +22,15 @@ variable "region" {
     description = "default region"
     default = "eu-west-1"
 }
+
+variable "create_role" {
+  description = "flag to create role"
+  type = bool
+  default = true
+}
+
+
+variable "existing_role_arn" {
+  type    = string
+  default = ""
+}

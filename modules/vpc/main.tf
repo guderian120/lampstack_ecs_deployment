@@ -74,8 +74,12 @@ resource "aws_subnet" "private" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.vpc_name}-${each.key}"
-      Tier = "private"
+      Name = "${var.vpc_name}-private-${each.key}",
+      # Critical RDS tags the console adds automatically:
+      "aws.rds.subnet.group" = "${var.vpc_name}-db-subnet-group",
+      "kubernetes.io/role/internal-elb" = "1",
+      Tier = "private",
+      Purpose = "database"
     }
   )
 }
