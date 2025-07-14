@@ -78,6 +78,17 @@ variable "alb_listener" {
   description = "alb listener"
 }
 
+variable "dr_desired" {
+  description = "desired value for DR"
+  type = number
+  default = 0
+}
+
+variable "is_dr" {
+  description = "a check if we are in DR"
+  type = bool
+  default = false 
+}
 variable "ecs_task_execution_role" {
   description = "task execution role"
 }

@@ -11,11 +11,11 @@ resource "aws_lb_target_group" "ecs" {
   name        = "${var.app_name}-tg"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc_id    
   target_type = "ip"
 
   health_check {
-    path                = "/"
+    path                = "/"      
     interval            = 30
     timeout             = 10
     healthy_threshold   = 3
@@ -35,35 +35,39 @@ resource "aws_lb_listener" "ecs" {
   }
 }
 
-# IAM Role for ECS with CloudWatch permissions
+# IAM Role for ECS with CloudWatch permissions# modules/ecs_iam/main.tf
 resource "aws_iam_role" "ecs_task_execution_role" {
+  count = var.create_role ? 1 : 0
+
   name = "${var.app_name}-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        "Sid": "",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "ecs-tasks.amazonaws.com"
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
         },
-        "Action": "sts:AssumeRole"
+        "Action" : "sts:AssumeRole"
       }
     ]
   })
 }
 
-# Attach the standard ECS task execution policy
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+  count = var.create_role ? 1 : 0
+
+  role       = aws_iam_role.ecs_task_execution_role[0].name  # Note the [0] index
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Add custom policy for CloudWatch logs access
 resource "aws_iam_role_policy" "ecs_cloudwatch_logs" {
+  count = var.create_role ? 1 : 0
+
   name = "${var.app_name}-ecs-cloudwatch-logs"
-  role = aws_iam_role.ecs_task_execution_role.id
+  role = aws_iam_role.ecs_task_execution_role[0].id  # Note the [0] index
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -75,13 +79,33 @@ resource "aws_iam_role_policy" "ecs_cloudwatch_logs" {
           "logs:PutLogEvents",
           "logs:CreateLogGroup"
         ],
-        Resource = [
-          "*"
-        ]
+        Resource = ["*"]
       }
     ]
   })
 }
+# Add custom policy for CloudWatch logs access
+# resource "aws_iam_role_policy" "ecs_cloudwatch_logs" {
+#   name = "${var.app_name}-ecs-cloudwatch-logs"
+#   role = aws_iam_role.ecs_task_execution_role.id
+
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "logs:CreateLogStream",
+#           "logs:PutLogEvents",
+#           "logs:CreateLogGroup"
+#         ],
+#         Resource = [
+#           "*"
+#         ]
+#       }
+#     ]
+#   })
+# }
 
 # Security Groups
 resource "aws_security_group" "ecs" {
@@ -129,3 +153,5 @@ resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.app_name}"
   retention_in_days = 30  # Added retention policy
 }
+
+

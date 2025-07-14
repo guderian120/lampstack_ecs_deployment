@@ -7,7 +7,7 @@ variable "vpc_name" {
 variable "cidr_block" {
   description = "CIDR block for the VPC"
   type        = string
-  default     = "10.0.0.0/16"
+ 
 }
 
 variable "public_subnets" {
@@ -16,16 +16,6 @@ variable "public_subnets" {
     cidr_block        = string
     availability_zone = string
   }))
-  default = {
-    "public-subnet-1" = {
-      cidr_block        = "10.0.1.0/24"
-      availability_zone = "eu-west-1a"
-    }
-    "public-subnet-2" = {
-      cidr_block        = "10.0.2.0/24"
-      availability_zone = "eu-west-1b"
-    }
-  }
 }
 
 variable "private_subnets" {
@@ -34,16 +24,7 @@ variable "private_subnets" {
     cidr_block        = string
     availability_zone = string
   }))
-  default = {
-    "private-subnet-1" = {
-      cidr_block        = "10.0.3.0/24"
-      availability_zone = "eu-west-1a"
-    }
-    "private-subnet-2" = {
-      cidr_block        = "10.0.4.0/24"
-      availability_zone = "eu-west-1b"
-    }
-  }
+   
 }
 
 variable "enable_nat_gateway" {

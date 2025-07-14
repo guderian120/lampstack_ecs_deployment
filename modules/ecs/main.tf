@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.cpu
   memory                   = var.memory
-  execution_role_arn       = var.ecs_task_execution_role.arn
+  execution_role_arn       = var.ecs_task_execution_role
 
   container_definitions = jsonencode([{
     name      = "${var.app_name}-container"
@@ -58,7 +58,7 @@ resource "aws_ecs_service" "service" {
   name            = "${var.app_name}-service"
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = var.desired_count
+  desired_count   = var.is_dr ? var.dr_desired : var.desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -75,3 +75,8 @@ resource "aws_ecs_service" "service" {
 
   depends_on = [var.alb_listener]
 }
+
+
+
+
+

@@ -1,86 +1,114 @@
+# variables.tf
 variable "name_prefix" {
-  description = "Prefix for resource names"
   type        = string
-  default     = "ecs-db"
-}
-
-variable "vpc_id" {
-  description = "VPC ID where the database will be deployed"
-  type        = string
+  description = "Prefix for all resources"
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs for the DB subnet group"
   type        = list(string)
+  description = "List of subnet IDs for the DB subnet group"
 }
 
+variable "kms_key_arn" {
+  description = "arn of kms key"
+}
 variable "security_group_ids" {
-  description = "List of security group IDs for the database"
   type        = list(string)
+  description = "List of security group IDs for the DB instance"
 }
 
 variable "allocated_storage" {
-  description = "Allocated storage in GB"
   type        = number
-  default     = 20
+  description = "Allocated storage in GB"
 }
 
 variable "engine" {
-  description = "Database engine"
   type        = string
   default     = "mysql"
+  description = "Database engine type"
 }
 
 variable "engine_version" {
-  description = "Database engine version"
   type        = string
-  default     = "8.0"
+  description = "Database engine version"
 }
 
 variable "instance_class" {
-  description = "DB instance class"
   type        = string
   default     = "db.t3.micro"
+  description = "Database instance class"
 }
 
 variable "db_name" {
-  description = "Initial database name"
   type        = string
-  default     = "ecsdb"
+  description = "Initial database name"
 }
 
 variable "username" {
-  description = "Master username"
   type        = string
-  default     = "admin"
+  description = "Master username"
 }
 
 variable "password" {
-  description = "Master password (should be passed via environment variables)"
   type        = string
   sensitive   = true
+  description = "Master password"
 }
 
 variable "parameter_group_name" {
-  description = "DB parameter group name"
   type        = string
-  default     = "default.mysql8.0"
+  default     = "default.mysql5.7"
+  description = "Parameter group name"
 }
 
 variable "skip_final_snapshot" {
-  description = "Skip final snapshot when destroying DB"
   type        = bool
   default     = true
+  description = "Skip final snapshot when destroying"
 }
 
 variable "backup_retention_period" {
-  description = "Backup retention period in days"
   type        = number
   default     = 7
+  description = "Backup retention period in days"
 }
 
 variable "tags" {
-  description = "Additional tags"
   type        = map(string)
   default     = {}
+  description = "Additional tags"
+}
+
+# New variables for replica configuration
+variable "is_replica" {
+  type        = bool
+  default     = false
+  description = "Whether this is a read replica"
+}
+
+variable "replicate_source_db" {
+  type        = string
+  default     = null
+  description = "ARN of the source DB for replication"
+}
+
+variable "backup_window" {
+  type        = string
+  default     = "03:00-04:00"
+  description = "Preferred backup window"
+}
+
+variable "maintenance_window" {
+  type        = string
+  default     = "sun:04:00-sun:05:00"
+  description = "Preferred maintenance window"
+}
+
+variable "multi_az" {
+  description = "multi availability zone support"
+}
+variable "storage_encrypted" {
+  type        = bool
+  default     = true
+  description = "Enable storage encryption"
 }
