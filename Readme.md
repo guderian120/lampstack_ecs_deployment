@@ -218,4 +218,3 @@ Feel free to [open an issue](https://github.com/guderian120/lampstack_ecs_deploy
 
 ---
 
-```
