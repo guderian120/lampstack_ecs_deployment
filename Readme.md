@@ -1,10 +1,4 @@
-Thank you — that's perfect.
 
-Based on your actual directory structure and clarification (no Route 53, failover is via **CloudWatch → SNS → Lambda**, and the DR scaling is handled directly), here is a **clean, professional `README.md`** rewritten to match your implementation.
-
----
-
-```markdown
 # 🛡️ Highly Available Pilot-Light LAMP Stack using AWS ECS
 
 This project implements a **pilot-light disaster recovery (DR)** architecture for a LAMP stack (Linux, Apache, MySQL, PHP) using AWS ECS Fargate, RDS, CloudWatch, and Lambda. Infrastructure is provisioned using **Terraform** in modular form.
