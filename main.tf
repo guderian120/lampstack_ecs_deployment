@@ -1,18 +1,3 @@
-# terraform {
-#   cloud {
-#     organization = "kryotech"
-#     workspaces {
-#       name = "ecs_stack_infranstructure"
-#     }
-#   }
-
-#   required_providers {
-#     aws = {
-#       source  = "hashicorp/aws"
-#       version = "~> 5.0"
-#     }
-#   }
-# }
 
 # ================================ PROVIDER INFORMATION ========================================================= #
 # Primary Region (eu-west-1 - Ireland)
@@ -41,7 +26,6 @@ module "primary_vpc" {
   vpc_name   = "ecs-production-vpc"
   cidr_block = "10.0.0.0/16"
 
-  # You can override the default subnets if needed
   public_subnets = {
     "public-subnet-1" = {
       cidr_block        = "10.0.1.0/24"
@@ -80,7 +64,6 @@ module "primary_security_groups" {
   ecs_security_group = module.primary_ecs_alb.ecs_security_group
   vpc_id             = module.primary_vpc.vpc_id
 
-  # Customize these as needed
   name_prefix = "prod-ecs"
 
   # Restrict SSH access in production!
@@ -130,7 +113,6 @@ module "primary_database" {
   ]
 }
 
-# Outputs
 
 
 
