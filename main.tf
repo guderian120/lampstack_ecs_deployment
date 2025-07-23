@@ -194,7 +194,6 @@ module "dr_vpc" {
   vpc_name   = "dr-ecs-vpc"
   cidr_block = "10.1.0.0/16"
 
-  # Only 1 subnet per type for DR
   public_subnets = {
     "public-subnet-1" = {
       cidr_block        = "10.1.1.0/24"
