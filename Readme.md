@@ -31,53 +31,7 @@ This solution ensures high availability of a LAMP application across two regions
 
 ## 🏗️ Architecture
 
-
-```mermaid
-flowchart TD
-    %% Primary Region Components
-    subgraph Primary["Primary Region (Active)"]
-        ALB_Primary["ALB (Primary)"] --> ECS_Service["ECS Service\n(Apache/PHP)"]
-        ECS_Service --> RDS_Primary["RDS MySQL\n(Primary)"]
-        Monitor[["CloudWatch Monitoring"]] --> Alarm_Primary["ALB/ECS Alarms"]
-        Alarm_Primary --> SNS_Primary["SNS Topic"]
-    end
-
-    %% Secondary Region Components
-    subgraph Secondary["Secondary Region (Standby)"]
-        ECS_Standby["ECS Service\n(Minimal Capacity)"]
-        RDS_Replica["RDS Read Replica"]
-        Lambda["Failover Lambda"]
-    end
-
-    %% Data Replication
-    RDS_Primary -->|Async Replication| RDS_Replica
-    S3_Primary["S3 (Primary)"] -->|Cross-Region Replication| S3_Secondary["S3 (Secondary)"]
-
-    %% Failover Flow
-    SNS_Primary -->|Trigger| Lambda
-    Lambda -->|1. Scale Up| ECS_Standby
-    Lambda -->|2. Promote| RDS_Replica
-    Lambda -->|3. Enable Traffic| ALB_Secondary["ALB (Secondary)"]
-
-    %% Client Access
-    Client[["Application Client"]] --> ALB_Primary
-    Client -.->|Failover| ALB_Secondary
-
-    %% Styling
-    classDef primary fill:#e6f3ff,stroke:#0066cc;
-    classDef secondary fill:#e6ffe6,stroke:#009900;
-    classDef data fill:#fff2e6,stroke:#ff6600;
-    classDef client fill:#f9f9f9,stroke:#333;
-
-    class Primary primary;
-    class Secondary secondary;
-    class Client client;
-    class S3_Primary,S3_Secondary,RDS_Primary,RDS_Replica data;
-```
-
-
-
-![Architecture Diagram](media/lampstack_design.png)
+![Architecture Diagram](media/dr.png)
 
 ### Primary Region Components:
 - ECS Cluster with Apache + PHP containers
