@@ -4,7 +4,27 @@ variable "db_password" {
   sensitive   = true
 }
 
-variable "ecr_repository_url"{
+variable "ecr_repository_url" {
   description = "ecr repository url"
-  type = string
+  type        = string
+}
+
+variable "primary_region" {
+  description = "primary region"
+
+}
+
+
+variable "dr_region" {
+  description = "region for DR"
+}
+variable "account_id" {
+  description = "account id"
+}
+
+variable "kms_key_arn" {
+  description = "arn of kms key"
+}
+variable "kms_replica_arn" {
+  description = "arn for key replica"
 }
